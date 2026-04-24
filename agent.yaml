@@ -1,0 +1,15 @@
+# This file is populated during onboarding. Do not edit by hand.
+name: STARTER_AGENT_NAME
+repo: ""
+port: 8080
+lock-file: /tmp/STARTER_AGENT_NAME.lock
+cron-file: /etc/cron.d/STARTER_AGENT_NAME
+cron-schedule: "0 */2 * * *"
+timezone: America/Los_Angeles
+wake-prompt: |
+  You are waking up for a scheduled work cycle. Follow the 'On Wake'
+  instructions in CLAUDE.md. This is an autonomous cycle — no human is present.
+respond-prompt: |
+  You received a message from your human. Follow the 'On Wake' instructions
+  in CLAUDE.md to recall your state, then respond.
+framework-last-known-good: null

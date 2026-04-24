@@ -1,0 +1,29 @@
+# Credentials
+.env
+.env.*
+
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Framework / agent runtime artifacts
+logs/cycles/*.log
+logs/supervisor.log
+logs/*.pid
+pending_notification.txt
+
+# Ephemeral data the agent may write locally
+*.tmp
+*.bak

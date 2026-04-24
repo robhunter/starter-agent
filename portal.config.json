@@ -1,0 +1,17 @@
+{
+  "name": "STARTER_AGENT_NAME",
+  "port": 8080,
+  "agentDir": "/root/STARTER_AGENT_NAME",
+  "cronFile": "/etc/cron.d/STARTER_AGENT_NAME",
+  "lockFile": "/tmp/STARTER_AGENT_NAME.lock",
+  "pidFile": "/tmp/STARTER_AGENT_NAME-portal-server.pid",
+  "authors": {
+    "human": { "color": "#1565c0", "bg": "#e3f2fd" },
+    "agent": { "color": "#4527a0", "bg": "#ede7f6" }
+  },
+  "features": {
+    "tabs": ["journal", "status", "outputs"],
+    "outputs": true,
+    "feedback": true
+  }
+}
