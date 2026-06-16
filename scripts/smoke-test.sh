@@ -85,6 +85,59 @@ fi
 pass "repo is in pristine uninitialized state"
 
 # ---------------------------------------------------------------------------
+header "Step 0: as-shipped artifacts are structurally valid"
+
+# These checks run against the COMMITTED templates before the later steps
+# mutate them (Step 2 overwrites the memory yamls; Step 4 replaces the
+# sentinels in agent.yaml + portal.config.json). They catch corruption in
+# the exact files a friend clones — a launch-blocker the behavioral steps
+# would mask, because they rewrite those same files before validating them.
+
+# 0a — every memory template parses as YAML and ships with the onboarding
+#      sentinel. ONBOARDING.md's resume logic ("skip to the first topic whose
+#      yaml is still status: uninitialized") relies on ALL four templates
+#      shipping uninitialized, not just persona.yaml (which the mode detector
+#      keys on). A template missing the sentinel would silently skip its topic.
+for f in memory/human.yaml memory/values.yaml memory/projects.yaml memory/persona.yaml; do
+  if "$PYTHON" -c "import yaml; yaml.safe_load(open('$f'))" 2>/dev/null; then
+    pass "$f parses as shipped"
+  else
+    fail "$f does not parse as shipped"
+  fi
+  if grep -q '^status: uninitialized' "$f"; then
+    pass "$f ships the uninitialized sentinel"
+  else
+    fail "$f is missing the uninitialized sentinel (onboarding resume precondition)"
+  fi
+done
+
+# 0b — config templates parse as shipped, with the STARTER_AGENT_NAME sentinel
+#      still present (pre-replacement). agent.yaml is read by the framework on
+#      every wake; portal.config.json is read by the portal server on boot. A
+#      syntax error here bricks the friend's first run before onboarding starts.
+if "$PYTHON" -c "import yaml; yaml.safe_load(open('agent.yaml'))" 2>/dev/null; then
+  pass "agent.yaml parses as shipped (sentinel present)"
+else
+  fail "agent.yaml does not parse as shipped"
+fi
+if "$PYTHON" -c "import json; json.load(open('portal.config.json'))" 2>/dev/null; then
+  pass "portal.config.json parses as shipped (sentinel present)"
+else
+  fail "portal.config.json does not parse as shipped"
+fi
+
+# 0c — every shipped shell script is syntactically valid. The friend's cycles
+#      shell out to these wrappers (commit.sh, log-event.sh, log-journal.sh,
+#      start.sh); a syntax error fails the cycle, often silently under cron.
+for s in scripts/*.sh; do
+  if bash -n "$s" 2>/dev/null; then
+    pass "$(basename "$s") passes bash -n syntax check"
+  else
+    fail "$(basename "$s") has a bash syntax error"
+  fi
+done
+
+# ---------------------------------------------------------------------------
 header "Step 1: mode detector triggers onboarding on pristine clone"
 
 grep -q '^status: uninitialized' memory/persona.yaml \
